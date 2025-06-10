@@ -190,6 +190,9 @@ vim.keymap.set('i', 'kj', '<Esc>', { desc = "Exit insert mode with 'kj'" })
 -- Split the screen vertically
 vim.keymap.set('n', '<leader>sv', '<C-w>v', { desc = 'Split window vertically' })
 
+-- Move cursor to the right window
+vim.keymap.set('n', '<leader>l', '<C-w>w', { desc = 'Move to next window' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
