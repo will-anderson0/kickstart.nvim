@@ -110,6 +110,9 @@ vim.opt.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
+-- Don't suggest to swapfiles
+vim.opt.swapfile = false
+
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -169,8 +172,23 @@ vim.opt.confirm = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- Save file
+vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Write (save) file' })
+
+-- Quit file
+vim.keymap.set('n', '<leader>q', ':q<CR>', { desc = 'Quit file' })
+
+-- Open terminal
+vim.keymap.set('n', '<leader>t', ':terminal<CR>', { desc = 'Open terminal' })
+
+-- Diagnostic Quickfix list
+vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open diagnostic Quickfix list' })
+
+-- Exit insert mode with 'kj'
 vim.keymap.set('i', 'kj', '<Esc>', { desc = "Exit insert mode with 'kj'" })
+
+-- Split the screen vertically
+vim.keymap.set('n', '<leader>sv', '<C-w>v', { desc = 'Split window vertically' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -261,6 +279,32 @@ require('lazy').setup({
     config = function()
       require('nvim-tree').setup {}
       vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle file tree' })
+    end,
+  },
+  {
+    'robitx/gp.nvim',
+    opts = {
+      openai_api_key = vim.env.OPENAI_API_KEY,
+    },
+    keys = {
+      {
+        '<leader>cc',
+        '<cmd>GpChatToggle<CR>',
+        desc = 'Toggle Chat Window',
+      },
+      {
+        '<leader>cp',
+        '<cmd>GpChatNew<CR>',
+        desc = 'Popup Chat',
+      },
+      {
+        '<leader>ce',
+        '<cmd>GpExplain<CR>',
+        desc = 'Explain Code',
+      },
+    },
+    config = function(_, opts)
+      require('gp').setup(opts)
     end,
   },
 
@@ -847,7 +891,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'super-tab',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
