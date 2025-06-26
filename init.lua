@@ -193,6 +193,10 @@ vim.keymap.set('n', '<leader>sv', '<C-w>v', { desc = 'Split window vertically' }
 -- Move cursor to the right window
 vim.keymap.set('n', '<leader>l', '<C-w>w', { desc = 'Move to next window' })
 
+-- Yank entire file by jumping around first
+vim.keymap.set('n', '<leader>z', 'ggVGy', { desc = 'Yank entire file' })
+vim.keymap.set('n', '<leader>Z', 'ggVGp', { desc = 'Replace entire file with register contents' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -674,16 +678,6 @@ require('lazy').setup({
                 vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
               end,
             })
-          end
-
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, '[T]oggle Inlay [H]ints')
           end
         end,
       })
