@@ -148,7 +148,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '» ', trail = ' ', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -190,10 +190,20 @@ vim.keymap.set('i', 'kj', '<Esc>', { desc = "Exit insert mode with 'kj'" })
 -- Split the screen vertically
 vim.keymap.set('n', '<leader>sv', '<C-w>v', { desc = 'Split window vertically' })
 
--- Move cursor to the right window
-vim.keymap.set('n', '<leader>l', '<C-w>w', { desc = 'Move to next window' })
+-- Split the screen horizontally
+vim.keymap.set('n', '<leader>sh', '<C-w>s', { desc = 'Split window horizontally' })
 
--- Yank entire file by jumping around first
+-- Move cursor to the right window
+vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Move to right window' })
+
+-- Move cursor to the left window
+vim.keymap.set('n', '<leader>h', '<C-w>h', { desc = 'Move to left window' })
+
+-- Move cursor to the above window
+vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Move to above window' })
+
+-- Move cursor to the below window
+vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Move to below window' }) -- Yank entire file by jumping around first
 vim.keymap.set('n', '<leader>z', 'ggVGy', { desc = 'Yank entire file' })
 vim.keymap.set('n', '<leader>Z', 'ggVGp', { desc = 'Replace entire file with register contents' })
 
@@ -492,7 +502,6 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
