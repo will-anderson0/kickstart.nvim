@@ -156,6 +156,8 @@ vim.opt.inccommand = 'split'
 -- Show which line your cursor is on
 vim.opt.cursorline = true
 
+vim.opt.termguicolors = true
+
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
@@ -288,40 +290,36 @@ require('lazy').setup({
       require('vscode').load()
     end,
   },
+
+  -- Icons: make sure it actually sets up
+  {
+    'nvim-tree/nvim-web-devicons',
+    enabled = true, -- force-enable if something else disabled it
+    lazy = true, -- it's fine to lazy-load
+    opts = { default = true }, -- fallback icons for unknown filetypes
+  },
+  -- nvim-tree with icons explicitly enabled
   {
     'nvim-tree/nvim-tree.lua',
     version = '*',
     lazy = false,
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
-      require('nvim-tree').setup {}
+      require('nvim-tree').setup {
+        renderer = {
+          icons = {
+            show = {
+              file = true,
+              folder = true,
+              folder_arrow = true,
+              git = true,
+            },
+            -- optional: tweak glyphs if you want
+            -- glyphs = { default = "", symlink = "", folder = { default = "", open = "" } },
+          },
+        },
+      }
       vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle file tree' })
-    end,
-  },
-  {
-    'robitx/gp.nvim',
-    opts = {
-      openai_api_key = vim.env.OPENAI_API_KEY,
-    },
-    keys = {
-      {
-        '<leader>cc',
-        '<cmd>GpChatToggle<CR>',
-        desc = 'Toggle Chat Window',
-      },
-      {
-        '<leader>cp',
-        '<cmd>GpChatNew<CR>',
-        desc = 'Popup Chat',
-      },
-      {
-        '<leader>ce',
-        '<cmd>GpExplain<CR>',
-        desc = 'Explain Code',
-      },
-    },
-    config = function(_, opts)
-      require('gp').setup(opts)
     end,
   },
 
@@ -453,9 +451,6 @@ require('lazy').setup({
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
-      -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
