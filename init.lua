@@ -148,7 +148,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = ' ', nbsp = '␣' }
+vim.opt.listchars = { tab = '→ ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -157,6 +157,13 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 vim.opt.termguicolors = true
+
+-- Make the cursorline highlight only the number column for a cleaner feel
+vim.opt.cursorlineopt = 'number'
+
+-- Keep popups crisp (no transparency)
+vim.opt.winblend = 0
+vim.opt.pumblend = 0
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
@@ -286,6 +293,8 @@ require('lazy').setup({
       vim.o.background = 'dark'
       require('vscode').setup {
         italic_comments = true,
+        transparent = false,
+        disable_nvimtree_bg = true,
       }
       require('vscode').load()
     end,
@@ -306,20 +315,52 @@ require('lazy').setup({
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('nvim-tree').setup {
+        filters = { custom = { '__pycache__', '%.pyc', '%.pyo', '.git', '.pytest_cache' } },
         renderer = {
-          icons = {
-            show = {
-              file = true,
-              folder = true,
-              folder_arrow = true,
-              git = true,
-            },
-            -- optional: tweak glyphs if you want
-            -- glyphs = { default = "", symlink = "", folder = { default = "", open = "" } },
-          },
+          icons = { show = { file = true, folder = true, folder_arrow = true, git = true } },
+          highlight_git = true,
+          indent_width = 2,
         },
+        view = { width = 30, preserve_window_proportions = true },
       }
       vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle file tree' })
+    end,
+  },
+
+  -- Bufferline (VSCode-like tabs)
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      require('bufferline').setup {
+        options = {
+          show_buffer_close_icons = false,
+          show_close_icon = false,
+          separator_style = 'thin',
+          diagnostics = 'nvim_lsp',
+          offsets = { { filetype = 'NvimTree', text = 'Explorer', text_align = 'left' } },
+        },
+      }
+    end,
+  },
+
+  -- Statusline (match VSCode theme)
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      require('lualine').setup {
+        options = { theme = 'vscode', globalstatus = true, component_separators = '', section_separators = '' },
+        sections = {
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch', 'diff' },
+          lualine_c = { { 'filename', path = 1 } },
+          lualine_x = { 'encoding', 'fileformat', 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' },
+        },
+      }
     end,
   },
 
@@ -475,20 +516,12 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
-        extensions = {
-          ['ui-select'] = {
-            require('telescope.themes').get_dropdown(),
-          },
+        defaults = {
+          layout_config = { prompt_position = 'top' },
+          sorting_strategy = 'ascending',
+          winblend = 0,
         },
+        extensions = { ['ui-select'] = require('telescope.themes').get_dropdown {} },
       }
 
       -- Enable Telescope extensions if they are installed
@@ -498,6 +531,13 @@ require('lazy').setup({
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+      -- VSCode-like quick open & find mappings
+      vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = 'Quick Open' })
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[F]ind by [G]rep' })
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind [B]uffers' })
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp' })
+      vim.keymap.set('n', '<leader>:', builtin.commands, { desc = 'Command Palette' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
@@ -939,6 +979,7 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
+    enabled = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       ---@diagnostic disable-next-line: missing-fields
@@ -976,20 +1017,7 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
+      -- Statusline handled by lualine
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
