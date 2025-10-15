@@ -1,122 +1,16 @@
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
-
-What is Kickstart?
-
-  Kickstart.nvim is *not* a distribution.
-
-  Kickstart.nvim is a starting point for your own configuration.
-    The goal is that you can read every line of code, top-to-bottom, understand
-    what your configuration is doing, and modify it to suit your needs.
-
-    Once you've done that, you can start exploring, configuring and tinkering to
-    make Neovim your own! That might mean leaving Kickstart just the way it is for a while
-    or immediately breaking it into modular pieces. It's up to you!
-
-    If you don't know anything about Lua, I recommend taking some time to read through
-    a guide. One possible example which will only take 10-15 minutes:
-      - https://learnxinyminutes.com/docs/lua/
-
-    After understanding a bit more about Lua, you can use `:help lua-guide` as a
-    reference for how Neovim integrates Lua.
-    - :help lua-guide
-    - (or HTML version): https://neovim.io/doc/user/lua-guide.html
-
-Kickstart Guide:
-
-  TODO: The very first thing you should do is to run the command `:Tutor` in Neovim.
-
-    If you don't know what this means, type the following:
-      - <escape key>
-      - :
-      - Tutor
-      - <enter key>
-
-    (If you already know the Neovim basics, you can skip this step.)
-
-  Once you've completed that, you can continue working through **AND READING** the rest
-  of the kickstart init.lua.
-
-  Next, run AND READ `:help`.
-    This will open up a help window with some basic information
-    about reading, navigating and searching the builtin help documentation.
-
-    This should be the first place you go to look when you're stuck or confused
-    with something. It's one of my favorite Neovim features.
-
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
-    which is very useful when you're not exactly sure of what you're looking for.
-
-  I have left several `:help X` comments throughout the init.lua
-    These are hints about where to find more information about the relevant settings,
-    plugins or Neovim features used in Kickstart.
-
-   NOTE: Look for lines like this
-
-    Throughout the file. These are for you, the reader, to help you understand what is happening.
-    Feel free to delete them once you know what you're doing, but they should serve as a guide
-    for when you are first encountering a few different constructs in your Neovim config.
-
-If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now! :)
---]]
-
--- Set <space> as the leader key
--- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
-
--- [[ Setting options ]]
--- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
---  For more options, you can see `:help option-list`
-
--- Make line numbers default
+vim.g.have_nerd_font = true
 vim.opt.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
-
--- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
-
--- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
 -- Don't suggest to swapfiles
 vim.opt.swapfile = false
 
 -- Sync clipboard between OS and Neovim.
---  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
@@ -148,7 +42,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '→ ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '→ ', trail = ' ', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -157,6 +51,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 vim.opt.termguicolors = true
+vim.opt.background = 'dark'
 
 -- Make the cursorline highlight only the number column for a cleaner feel
 vim.opt.cursorlineopt = 'number'
@@ -259,6 +154,20 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- One place to set your grey
+local GREY_BG = '#252525' -- nice dark grey (try #1E1E1E, #2A2A2A, #303030)
+
+-- helper to force grey background on any theme
+local function use_grey_bg()
+  vim.opt.termguicolors = true
+  vim.opt.background = 'dark'
+  vim.api.nvim_set_hl(0, 'Normal', { bg = GREY_BG })
+  vim.api.nvim_set_hl(0, 'NormalNC', { bg = GREY_BG })
+  vim.api.nvim_set_hl(0, 'SignColumn', { bg = GREY_BG })
+  vim.api.nvim_set_hl(0, 'NormalFloat', { bg = GREY_BG })
+  vim.api.nvim_set_hl(0, 'FloatBorder', { bg = GREY_BG })
+end
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -271,35 +180,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
--- [[ Configure and install plugins ]]
---
---  To check the current status of your plugins, run
---    :Lazy
---
---  You can press `?` in this menu for help. Use `:q` to close the window
---
---  To update plugins you can run
---    :Lazy update
---
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  {
-    'Mofiqul/vscode.nvim',
-    lazy = false,
-    priority = 1000,
-    config = function()
-      vim.o.background = 'dark'
-      require('vscode').setup {
-        italic_comments = true,
-        transparent = false,
-        disable_nvimtree_bg = true,
-      }
-      require('vscode').load()
-    end,
-  },
-
   -- Icons: make sure it actually sets up
   {
     'nvim-tree/nvim-web-devicons',
@@ -340,25 +224,6 @@ require('lazy').setup({
           separator_style = 'thin',
           diagnostics = 'nvim_lsp',
           offsets = { { filetype = 'NvimTree', text = 'Explorer', text_align = 'left' } },
-        },
-      }
-    end,
-  },
-
-  -- Statusline (match VSCode theme)
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = 'nvim-tree/nvim-web-devicons',
-    config = function()
-      require('lualine').setup {
-        options = { theme = 'vscode', globalstatus = true, component_separators = '', section_separators = '' },
-        sections = {
-          lualine_a = { 'mode' },
-          lualine_b = { 'branch', 'diff' },
-          lualine_c = { { 'filename', path = 1 } },
-          lualine_x = { 'encoding', 'fileformat', 'filetype' },
-          lualine_y = { 'progress' },
-          lualine_z = { 'location' },
         },
       }
     end,
@@ -973,30 +838,43 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    enabled = false,
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+  {
+    'bluz71/vim-moonfly-colors',
+    name = 'moonfly',
+    lazy = false,
+    priority = 1000,
     config = function()
-      ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
-      }
+      -- Moonfly options (see repo README)
+      vim.g.moonflyItalics = false -- no italic comments
+      vim.g.moonflyCursorColor = true -- color the cursor
+      vim.g.moonflyNormalFloat = true -- floats use moonfly fg/bg
+      vim.g.moonflyNormalPmenu = true -- popup menu uses moonfly fg/bg
+      vim.g.moonflyTransparent = false -- let the theme paint a solid bg
 
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'vscode'
+      vim.opt.termguicolors = true
+      vim.opt.background = 'dark'
+
+      vim.cmd.colorscheme 'moonfly'
+
+      -- Match your WezTerm dark grey (keeps things saturated & readable)
+      local GREY_BG = '#252525'
+      local HL = vim.api.nvim_set_hl
+      HL(0, 'Normal', { fg = '#EDEFF4', bg = GREY_BG })
+      HL(0, 'NormalNC', { fg = '#C8CCD4', bg = GREY_BG })
+      HL(0, 'SignColumn', { bg = GREY_BG })
+      HL(0, 'NormalFloat', { fg = '#EDEFF4', bg = GREY_BG })
+      HL(0, 'FloatBorder', { fg = '#7AA2F7', bg = GREY_BG })
+      HL(0, 'CursorLine', { bg = '#2F2F2F' })
+      HL(0, 'CursorColumn', { bg = '#2F2F2F' })
+      HL(0, 'Visual', { bg = '#3A3A3A' })
+      HL(0, 'LineNr', { fg = '#7A808A' })
+      HL(0, 'CursorLineNr', { fg = '#FFFFFF', bold = true })
+      HL(0, 'StatusLine', { fg = '#EDEFF4', bg = '#3A3A3A', bold = true })
+      HL(0, 'StatusLineNC', { fg = '#B7BDC7', bg = '#2F2F2F' })
+      HL(0, 'VertSplit', { fg = '#3A3A3A' })
     end,
   },
 
-  -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
   { -- Collection of various small independent plugins/modules
@@ -1096,6 +974,9 @@ require('lazy').setup({
     },
   },
 })
+
+-- slightly brighter grey
+vim.api.nvim_set_hl(0, 'Visual', { bg = '#eeeeee' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
